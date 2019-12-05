@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApplication1.WebApi
 {
 	[Produces("application/json")]
-	[Route("api/Default")]
+	[Route("api/Default/[action]")]
 	public class DefaultController : Controller
 	{
 		private readonly IGoodService goodService;
@@ -33,47 +33,22 @@ namespace WebApplication1.WebApi
 		//}
 
 		// GET: api/Default/PageIndex
-		[HttpGet]
-		public OnlineShopServiceResult<GetGoodResponse> GetGoods(int pageIndex)
+		[HttpGet("{pageIndex}")]
+		public GetGoodResponse GetGoods(int pageIndex)
 		{
 			return this.goodService.Get(new GetGoodRequest {
 				 PageIndex=pageIndex
-			} );
+			}).Result;
 		}
 
 
 		//// POST: api/Default/title
 		[HttpPost]
-		public OnlineShopServiceResult<AddItemResponse> AddItem([FromBody]string title)
+		public OnlineShopServiceResult<AddItemResponse> AddItem(string title)
 		{
 			return this.goodService.AddItem(new AddItemRequest {
 				 Title=title
 			});
 		}
-
-		//// GET: api/Default/5
-		//[HttpGet("{id}", Name = "Get")]
-		//public string Get(int id)
-		//{
-		//    return "value";
-		//}
-
-		//// POST: api/Default
-		//[HttpPost]
-		//public void Post([FromBody]string value)
-		//{
-		//}
-
-		//// PUT: api/Default/5
-		//[HttpPut("{id}")]
-		//public void Put(int id, [FromBody]string value)
-		//{
-		//}
-
-		//// DELETE: api/ApiWithActions/5
-		//[HttpDelete("{id}")]
-		//public void Delete(int id)
-		//{
-		//}
 	}
 }

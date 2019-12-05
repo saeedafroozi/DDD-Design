@@ -7,7 +7,7 @@ var react_redux_1 = require("react-redux");
 var Good = function (_a) {
     var dispatch = _a.dispatch, addItem = _a.addItem, deleteItem = _a.deleteItem, goods = _a.goods, initGood = _a.initGood;
     React.useEffect(function () {
-        initGood("api/Default", 1);
+        initGood("api/Default/GetGoods", 1);
     }, []);
     return React.createElement("div", null, "Goods!");
 };

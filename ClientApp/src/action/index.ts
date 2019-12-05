@@ -1,5 +1,5 @@
 ﻿
-import { fetchConfig }  from '../constant/index'
+import { getData, postData, fetchConfigGet } from '../constant/index'
 
 export const ACTION_TYPES = {
 	ADD_ITEM: 'ADD_ITEM',
@@ -15,19 +15,30 @@ interface Item {
 }
 
 
+
 export const initGood = (url: string, pageIndex: number) => dispatch => {
 	dispatch(setIsLoading(true));
-	return fetch(url, fetchConfig)
+	return fetch(`${url}/${pageIndex}`, {
+		...fetchConfigGet,
+	})
 		.then(response => {
 			response.json()
 				.then((data: Item[]) => {
-					//const responseData = mapToResponseResult(FetchType.Category, response, data)
 					dispatch({
 						type: ACTION_TYPES.INIT_GOOD,
 						payload: data
 					});
 				})
 		}).catch(ex => dispatch(fetchFailure(ex)))
+	//try {
+	//	const data = await getData(url, { pageIndex: pageIndex }) ;
+	//	dispatch({
+	//		type: ACTION_TYPES.INIT_GOOD,
+	//		payload: data
+	//	});
+	//} catch (ex) {
+	//	dispatch(fetchFailure(ex))
+	//}
 }
 function fetchFailure(ex) {
 

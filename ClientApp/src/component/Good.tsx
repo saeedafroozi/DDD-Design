@@ -18,7 +18,7 @@ interface GoodSate {
 }
 const Good = ({ dispatch, addItem, deleteItem, goods, initGood }: GoodProps & GoodSate) => {
 	React.useEffect(() => {
-		initGood("api/Default",1);
+		initGood("api/Default/GetGoods",1);
 	},[])
 	return <div>Goods!</div>
 }
