@@ -1,0 +1,21 @@
+{
+	"compileOnSave": true,
+
+	"compilerOptions": {
+		"sourceMap": true,
+		"target": "es5",//specify the rule for transpiling typescript into esmascripts
+		"module": "commonjs",
+		"declaration": false,
+		"noImplicitAny": false,
+		"removeComments": true,
+		"experimentalDecorators": true,
+		"noLib": false,
+		"jsx": "react",
+		"allowSyntheticDefaultImports": true//allow us default import with out any export
+	},
+
+	"exclude": [
+		"node_modules",//prevent type script from diging into node_module except the packages have @type
+		"static"
+	]
+}
