@@ -65,7 +65,7 @@ namespace Domain.RepositoryContract
         //      /// </summary>
         //      /// <param name="entity">The entity from which the primary keys will be extracted and used for filtering.</param>
         //      /// <returns>Returns single record based on its primary keys</returns>
-             TEntity Get(TEntity entity);
+             TEntity Get(TPrimaryKey primaryKey, string condition);
     }
 
 }

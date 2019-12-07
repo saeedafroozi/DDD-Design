@@ -6,8 +6,12 @@ using System.Text;
 
 namespace Business
 {
-	public class GoodService : IGoodService
+	internal class GoodService : IGoodService
 	{
+        public GoodService()
+        {
+
+        }
 		public OnlineShopServiceResult<GetGoodResponse> Get(GetGoodRequest request)
 		{
 			return new OnlineShopServiceResult<GetGoodResponse>(result: new GetGoodResponse

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,23 +13,23 @@ namespace DataAccess.Repository
 {
     internal class Repository<TEntity, TPrimaryKey> : IRepository<TEntity, TPrimaryKey> where TEntity : class
     {
-        private readonly IConfiguration _config;
+        // private readonly IConfiguration _config;
         private TimeSpan commandTimeout = TimeSpan.FromSeconds(120);
-        private readonly Func<SqlConnection> _dbConnectionFactory;
+        private readonly IDbContext dbContext;
 
 
-        public Repository(Func<SqlConnection> dbConnectionFactory)
+        public Repository(IDbContext dbContext)
         {
-            _dbConnectionFactory = dbConnectionFactory ?? throw new ArgumentNullException(nameof(dbConnectionFactory));
+            dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        //public IDbConnection Connection
-        //{
-        //    get
-        //    {
-        //        return new SqlConnection(_config.GetConnectionString("MyConnectionString"));
-        //    }
-        //}
+        public Func<SqlConnection> Connection
+        {
+            get
+            {
+                return new Func<SqlConnection>(()=>new SqlConnection(dbContext.Connection.ToString()));
+            }
+        }
 
         public async Task Insert(TEntity entity)
         {
@@ -40,7 +41,7 @@ namespace DataAccess.Repository
             //    return result.FirstOrDefault();
             //}
             //Connection.Insert(entity, statement => statement.AttachToTransaction(Transaction).WithTimeout(commandTimeout));
-            using (var connection = _dbConnectionFactory.Invoke())
+            using (var connection = Connection.Invoke())
             {
                 await connection.OpenAsync();
 
@@ -72,7 +73,7 @@ namespace DataAccess.Repository
 
         public async Task<bool> Update(TEntity entity)
         {
-            using (var connection = _dbConnectionFactory.Invoke())
+            using (var connection = Connection.Invoke())
             {
                 await connection.OpenAsync();
 
@@ -104,14 +105,25 @@ namespace DataAccess.Repository
         //      bool Exists();
 
 
-        TEntity Get(TPrimaryKey primaryKey)
+        public TEntity Get(TPrimaryKey primaryKey, string condition)
         {
-            using (var connection = _dbConnectionFactory.Invoke())
+            using (var connection = Connection.Invoke())
             {
                 connection.OpenAsync();
                 using (var transaction = connection.BeginTransaction())
                 {
-                    var result = connection.Find(statement=> statement.Top(1));
+                    var result = connection.Find<TEntity>(statement =>
+                    {
+                        statement.AttachToTransaction(transaction)
+                                         .WithTimeout(this.commandTimeout)
+                                         .Top(1);
+
+                        if (!string.IsNullOrEmpty(condition))
+                            statement.Where($"{condition}");
+
+
+                    })
+            .SingleOrDefault();
                     transaction.Commit();
                     return result;
 
