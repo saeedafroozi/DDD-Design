@@ -1,73 +1,80 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Business;
-using Domain.RepositoryContract;
-using Domain.ServiceContract;
+using DataAccess;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
+using System.Reflection;
 
 namespace WebApplication1
 {
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+	public class Startup
+	{
+		public Startup(IConfiguration configuration)
+		{
+			Configuration = configuration;
+		}
 
-        public IConfiguration Configuration { get; }
+		public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddMvc();
+		// This method gets called by the runtime. Use this method to add services to the container.
+		public IServiceProvider ConfigureServices(IServiceCollection services)
+		{
+			services.AddMvc();
 
-            services.Scan(scan => scan
-            .FromAssemblyOf()
-           .AddClasses(classes => classes.AssignableTo<IGoodService>(),publicOnly:false)
-           .AsImplementedInterfaces()
-           .WithScopedLifetime());
+			var builder = new ContainerBuilder();
 
-            services.Scan(scan => scan
-           .FromAssemblyOf<IGoodRepository>()
-           .AddClasses(classes => classes.AssignableTo<IGoodRepository>(), publicOnly: false)
-           .AsImplementedInterfaces()
-           .WithScopedLifetime());
+			builder.Populate(services);
+			builder.RegisterModule(new InfrastructorModule());
+			builder.RegisterModule(new CoreModule());
+			
+			//builder.Populate(services);
+			var container = builder.Build();
+			// Create the IServiceProvider based on the container.
+			return new AutofacServiceProvider(container);
 
-            services.Scan(scan => scan
-           .FromAssemblyOf<IDbContext>()
-           .AddClasses(classes => classes.AssignableTo<IDbContext>(), publicOnly: false)
-           .AsImplementedInterfaces()
-           .WithScopedLifetime());
+			//var service = Assembly.GetExecutingAssembly();
+
+			//builder.RegisterAssemblyTypes(service)
+			//			 .Where(t => t.Name.EndsWith("Business"))
+			//			 .AsImplementedInterfaces();
+
+			//var dataAccess = Assembly.GetExecutingAssembly();
+
+			//builder.RegisterAssemblyTypes(dataAccess)
+			//			 .Where(t => t.Name.EndsWith("dataAccess"))
+			//			 .AsImplementedInterfaces();
 
 
-        }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseBrowserLink();
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-            }
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                                    name: "default",
-                                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
-        }
-    }
+		}
+
+		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+		{
+			if (env.IsDevelopment())
+			{
+				app.UseBrowserLink();
+				app.UseDeveloperExceptionPage();
+			}
+			else
+			{
+				app.UseExceptionHandler("/Home/Error");
+			}
+			app.UseDefaultFiles();
+			app.UseStaticFiles();
+
+			app.UseMvc(routes =>
+			{
+				routes.MapRoute(
+																	name: "default",
+																	template: "{controller=Home}/{action=Index}/{id?}");
+			});
+		}
+	}
 }
