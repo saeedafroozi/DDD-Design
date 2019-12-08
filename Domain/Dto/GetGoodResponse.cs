@@ -8,6 +8,6 @@ namespace Domain.Dto
     public class GetGoodResponse
     {
 		public int Total { get; set; }
-		public List<Good> Data { get; set; }
+		public IEnumerable<Good> Data { get; set; }
 	}
 }

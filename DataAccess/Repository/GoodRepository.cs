@@ -6,20 +6,21 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace DataAccess.Repository
 {
-    internal class GoodRepository: Repository<Good, int>,IGoodRepository
+    internal sealed class GoodRepository: Repository<Good, int>,IGoodRepository
     {
-        //private readonly IConfiguration _config;
-        public GoodRepository(IDbContext dbContext) :base(dbContext)
+        private readonly IConfiguration _config;
+        public GoodRepository(IConfiguration config) :base(config)
         {
 
         }
-
-
-        public Good Get(int id) {
-            return base.Get(id,string.Empty);
+        public async Task<IEnumerable<Good>> GetAllGoods()
+        {
+           return await base.GetAllAsync();
         }
+
     }
 }
