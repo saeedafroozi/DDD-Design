@@ -30,7 +30,7 @@
     "browser-sync": "^2.26.7",
     "browser-sync-webpack-plugin": "^2.2.2",
     "css-loader": "^3.2.1",
-    "node-sass": "^4.13.0",
+    "node-sass": "^7.0.0",
     "redux-devtools": "^3.5.0",
     "sass-loader": "^8.0.0",
     "style-loader": "^1.0.1",
